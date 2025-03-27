@@ -55,6 +55,14 @@ jobs:
           --task-definition ${{ env.ECS_TASK_DEFINITION }} \
           --query taskDefinition > task-definition.json
 
+    # Nuevo paso para remover el campo enableFaultInjection
+    - name: Remove unsupported fields from task definition
+      run: |
+        # Usar jq para eliminar el campo enableFaultInjection si existe
+        jq 'del(.enableFaultInjection)' task-definition.json > cleaned-task-definition.json
+        mv cleaned-task-definition.json task-definition.json
+        cat task-definition.json
+
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
